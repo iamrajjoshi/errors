@@ -4,8 +4,7 @@ import React, { useState, useRef } from 'react';
 import { 
   Button, 
   Input, 
-  VStack, 
-  Text, 
+  VStack,
   useToast, 
   AlertDialog,
   AlertDialogBody,
