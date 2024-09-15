@@ -76,6 +76,7 @@ const ErrorGenerator = () => {
     for (let i = 0; i < count; i++) {
       try {
         // Intentionally cause a ReferenceError
+        // @ts-expect-error - nonExistentFunction is not defined
         nonExistentFunction();
       } catch (error) {
         if (error instanceof Error) {
