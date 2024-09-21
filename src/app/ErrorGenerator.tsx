@@ -1,11 +1,11 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { 
-  Button, 
-  Input, 
+import {
+  Button,
+  Input,
   VStack,
-  useToast, 
+  useToast,
   AlertDialog,
   AlertDialogBody,
   AlertDialogFooter,
@@ -22,7 +22,10 @@ import {
   FormErrorMessage,
   Box,
 } from '@chakra-ui/react';
+import { v4 as uuidv4 } from 'uuid';
+
 import * as Sentry from '@sentry/browser';
+import { CaptureContext, User } from '@sentry/types';
 
 const ErrorGenerator = () => {
   const [dsn, setDsn] = useState('');
@@ -66,49 +69,35 @@ const ErrorGenerator = () => {
       return;
     }
 
-    // Initialize Sentry with the user-provided DSN
     Sentry.init({
       dsn: dsn,
-      release: "error-generator@1.0.0",
-      environment: "test",
+      environment: 'test',
     });
 
-    for (let i = 0; i < count; i++) {
-      try {
-        // Intentionally cause a ReferenceError
-        // @ts-expect-error - nonExistentFunction is not defined
-        nonExistentFunction();
-      } catch (error) {
-        if (error instanceof Error) {
-          // Enhance the error with a custom stack trace
-          error.stack = `ReferenceError: nonExistentFunction is not defined
-    at SentryErrorGenerator.generateErrors (/src/components/SentryErrorGenerator.tsx:50:13)
-    at HTMLUnknownElement.callCallback (/src/react-dom.development.js:3945:14)
-    at Object.invokeGuardedCallbackDev (/src/react-dom.development.js:3994:16)
-    at invokeGuardedCallback (/src/react-dom.development.js:4056:31)
-    at HTMLUnknownElement.invokeEventListeners (/src/react-dom.development.js:5007:7)`;
+    const fingerprint = [uuidv4()];
 
-          Sentry.captureException(error, {
-            tags: { error_generator: "v1.0" },
-            extra: {
-              errorIndex: i,
-              timestamp: new Date().toISOString(),
-              userAgent: navigator.userAgent,
-              randomValue: Math.random()
-            },
-            user: {
-              id: `test-user-${Math.floor(Math.random() * 1000)}`,
-              email: `user${Math.floor(Math.random() * 1000)}@example.com`,
-              username: `testuser${Math.floor(Math.random() * 1000)}`,
-            },
-          });
-        }
-      }
+    for (let i = 0; i < count; i++) {
+      const event_id = uuidv4();
+      const user: User = {
+        id: `test-user-${i}`,
+        email: `test-user-${1}@user.com`,
+        username: `testuser${i}`,
+      };
+
+      const captureContext: CaptureContext = {
+        user: user,
+        fingerprint: fingerprint,
+        level: 'error',
+      };
+
+      Sentry.captureMessage(`Error generated with event_id: ${event_id}`, captureContext);
     }
+
+    Sentry.flush(20000);
 
     toast({
       title: 'Errors sent',
-      description: `${count} ReferenceErrors have been sent to Sentry`,
+      description: `${count} errors have been sent to Sentry`,
       status: 'success',
       duration: 3000,
       isClosable: true,
@@ -125,11 +114,7 @@ const ErrorGenerator = () => {
     <VStack spacing={4} align="stretch">
       <FormControl isInvalid={!!dsnError}>
         <FormLabel>Sentry DSN</FormLabel>
-        <Input
-          placeholder="Enter Sentry DSN"
-          value={dsn}
-          onChange={handleDsnChange}
-        />
+        <Input placeholder="Enter Sentry DSN" value={dsn} onChange={handleDsnChange} />
         <FormErrorMessage>{dsnError}</FormErrorMessage>
       </FormControl>
       <FormControl>
@@ -148,11 +133,7 @@ const ErrorGenerator = () => {
         </Button>
       </Box>
 
-      <AlertDialog
-        isOpen={isOpen}
-        leastDestructiveRef={cancelRef}
-        onClose={onClose}
-      >
+      <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose}>
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
@@ -160,9 +141,9 @@ const ErrorGenerator = () => {
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Warning: This action will generate real errors and use up your Sentry quota. 
-              This may result in additional costs depending on your Sentry plan. 
-              Are you sure you want to proceed?
+              Warning: This action will generate real errors and use up your Sentry quota. This may
+              result in additional costs depending on your Sentry plan. Are you sure you want to
+              proceed?
             </AlertDialogBody>
 
             <AlertDialogFooter>
