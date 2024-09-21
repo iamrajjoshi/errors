@@ -11,7 +11,11 @@ const SentryPage = () => {
             Sentry Error Generator
           </Heading>
           <Text fontSize="xl" textAlign="center">
-            Generate and send test errors to your Sentry project
+            Generate and send test errors to your Sentry project.
+            <br />
+            You might need to disable your Adblocker to send the errors.
+            <br />
+            Safari works great.
           </Text>
           <ErrorGenerator />
         </VStack>
