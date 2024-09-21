@@ -22,8 +22,8 @@ import {
   FormErrorMessage,
   Box,
 } from '@chakra-ui/react';
-import { v4 as uuidv4 } from 'uuid';
 
+import { v4 as uuidv4 } from 'uuid';
 import * as Sentry from '@sentry/browser';
 import { CaptureContext, User } from '@sentry/types';
 
@@ -35,12 +35,14 @@ const ErrorGenerator = () => {
   const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
 
-  const validateDsn = (value: string) => {
+  const validateDsn = (value: string): boolean => {
     if (!value) {
       setDsnError('DSN is required');
       return false;
     }
-    if (!/^https:\/\/[a-zA-Z0-9]+@[a-zA-Z0-9]+\.ingest\.(us|de)\.sentry\.io\/[0-9]+$/.test(value)) {
+    const dsnRegex =
+      /^https:\/\/[a-zA-Z0-9]+@([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+\/[0-9]+$/;
+    if (!dsnRegex.test(value)) {
       setDsnError('Invalid DSN format');
       return false;
     }
@@ -80,27 +82,27 @@ const ErrorGenerator = () => {
       const event_id = uuidv4();
       const user: User = {
         id: `test-user-${i}`,
-        email: `test-user-${1}@user.com`,
+        email: `test-user-${i}@example.com`,
         username: `testuser${i}`,
       };
 
       const captureContext: CaptureContext = {
-        user: user,
-        fingerprint: fingerprint,
+        user,
+        fingerprint,
         level: 'error',
       };
 
       Sentry.captureMessage(`Error generated with event_id: ${event_id}`, captureContext);
     }
 
-    Sentry.flush(20000);
-
-    toast({
-      title: 'Errors sent',
-      description: `${count} errors have been sent to Sentry`,
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
+    Sentry.flush(20000).then(() => {
+      toast({
+        title: 'Errors sent',
+        description: `${count} errors have been sent to Sentry`,
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
     });
   };
 
@@ -139,13 +141,11 @@ const ErrorGenerator = () => {
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
               Generate Errors
             </AlertDialogHeader>
-
             <AlertDialogBody>
               Warning: This action will generate real errors and use up your Sentry quota. This may
               result in additional costs depending on your Sentry plan. Are you sure you want to
               proceed?
             </AlertDialogBody>
-
             <AlertDialogFooter>
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
