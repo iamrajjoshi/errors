@@ -120,7 +120,7 @@ const ErrorGenerator = () => {
         <FormErrorMessage>{dsnError}</FormErrorMessage>
       </FormControl>
       <FormControl>
-        <FormLabel>Number of Errors to Generate</FormLabel>
+        <FormLabel>Number of Events to Generate</FormLabel>
         <NumberInput min={1} value={errorCount} onChange={(value) => setErrorCount(value)}>
           <NumberInputField />
           <NumberInputStepper>
