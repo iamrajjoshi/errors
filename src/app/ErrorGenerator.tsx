@@ -121,7 +121,7 @@ const ErrorGenerator = () => {
         <FormErrorMessage>{dsnError}</FormErrorMessage>
       </FormControl>
       <FormControl>
-        <FormLabel>Fingerprint ID (Optional - to group or add event to a specific issue)</FormLabel>
+        <FormLabel>Fingerprint ID (Optional - to add events to a specific issue)</FormLabel>
         <Input
           placeholder="Enter a fingerprint ID to group errors"
           value={fingerprintID}
