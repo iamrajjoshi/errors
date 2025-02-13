@@ -30,6 +30,7 @@ import { CaptureContext, User } from '@sentry/types';
 const ErrorGenerator = () => {
   const [dsn, setDsn] = useState('');
   const [errorCount, setErrorCount] = useState('');
+  const [fingerprintID, setFingerprintID] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [dsnError, setDsnError] = useState('');
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -76,7 +77,7 @@ const ErrorGenerator = () => {
       environment: 'test',
     });
 
-    const fingerprint = [uuidv4()];
+    const fingerprintPayload = fingerprintID ? [fingerprintID] : [uuidv4()];
 
     for (let i = 0; i < count; i++) {
       const event_id = uuidv4();
@@ -88,7 +89,7 @@ const ErrorGenerator = () => {
 
       const captureContext: CaptureContext = {
         user,
-        fingerprint,
+        fingerprint: fingerprintPayload,
         level: 'error',
       };
 
@@ -118,6 +119,14 @@ const ErrorGenerator = () => {
         <FormLabel>Sentry DSN</FormLabel>
         <Input placeholder="Enter Sentry DSN" value={dsn} onChange={handleDsnChange} />
         <FormErrorMessage>{dsnError}</FormErrorMessage>
+      </FormControl>
+      <FormControl>
+        <FormLabel>Fingerprint ID (Optional - to group or add event to a specific issue)</FormLabel>
+        <Input
+          placeholder="Enter a fingerprint ID to group errors"
+          value={fingerprintID}
+          onChange={(e) => setFingerprintID(e.target.value)}
+        />
       </FormControl>
       <FormControl>
         <FormLabel>Number of Events to Generate</FormLabel>
