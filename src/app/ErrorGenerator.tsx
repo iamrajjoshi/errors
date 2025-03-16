@@ -29,7 +29,7 @@ import { CaptureContext, User } from '@sentry/types';
 
 const ErrorGenerator = () => {
   const [dsn, setDsn] = useState('');
-  const [errorCount, setErrorCount] = useState('');
+  const [errorCount, setErrorCount] = useState('1');
   const [errorsToGenerate, setErrorsToGenerate] = useState('1');
   const [fingerprintID, setFingerprintID] = useState('');
   const [isOpen, setIsOpen] = useState(false);
