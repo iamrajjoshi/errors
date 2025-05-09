@@ -1,9 +1,9 @@
-import { extendTheme, type ThemeConfig } from '@chakra-ui/react'
+import { extendTheme, type ThemeConfig } from '@chakra-ui/react';
 
 const config: ThemeConfig = {
   initialColorMode: 'dark',
   useSystemColorMode: false,
-}
+};
 
 const colors = {
   brand: {
@@ -21,12 +21,12 @@ const colors = {
   background: {
     dark: '#121212', // Updated to a darker, more neutral background color
   },
-}
+};
 
 const fonts = {
   heading: '"Poppins", sans-serif',
   body: '"Inter", sans-serif',
-}
+};
 
 const styles = {
   global: {
@@ -34,7 +34,7 @@ const styles = {
       bg: 'background.dark',
     },
   },
-}
+};
 
 const components = {
   Button: {
@@ -75,14 +75,14 @@ const components = {
       },
     },
   },
-}
+};
 
-const theme = extendTheme({ 
+const theme = extendTheme({
   config,
   colors,
   fonts,
   styles,
   components,
-})
+});
 
-export default theme
+export default theme;

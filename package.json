@@ -27,6 +27,7 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@sentry/browser": "^8.30.0",
+    "@sentry/nextjs": "^9.17.0",
     "@sentry/types": "^8.30.0",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
     "@typescript-eslint/parser": "^8.6.0",

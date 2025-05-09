@@ -23,16 +23,13 @@ import {
   Box,
 } from '@chakra-ui/react';
 
-import { v4 as uuidv4 } from 'uuid';
-import * as Sentry from '@sentry/browser';
-import { CaptureContext, User } from '@sentry/types';
-
 const ErrorGenerator = () => {
   const [dsn, setDsn] = useState('');
   const [errorCount, setErrorCount] = useState('1');
   const [errorsToGenerate, setErrorsToGenerate] = useState('1');
   const [fingerprintID, setFingerprintID] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [dsnError, setDsnError] = useState('');
   const cancelRef = useRef<HTMLButtonElement>(null);
   const toast = useToast();
@@ -58,7 +55,7 @@ const ErrorGenerator = () => {
     validateDsn(value);
   };
 
-  const generateErrors = () => {
+  const generateErrors = async () => {
     if (!validateDsn(dsn)) return;
 
     const eventsPerError = parseInt(errorCount, 10);
@@ -86,41 +83,48 @@ const ErrorGenerator = () => {
       return;
     }
 
-    Sentry.init({
-      dsn: dsn,
-      environment: 'test',
-    });
+    setIsLoading(true);
 
-    for (let errorIndex = 0; errorIndex < numErrors; errorIndex++) {
-      const errorFingerprint = fingerprintID ? [fingerprintID] : [uuidv4()];
+    try {
+      const response = await fetch('/api/generate-errors', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          dsn,
+          errorCount: eventsPerError,
+          errorsToGenerate: numErrors,
+          fingerprintID,
+        }),
+      });
 
-      for (let eventIndex = 0; eventIndex < eventsPerError; eventIndex++) {
-        const event_id = uuidv4();
-        const user: User = {
-          id: `test-user-${errorIndex}-${eventIndex}`,
-          email: `test-user-${errorIndex}-${eventIndex}@example.com`,
-          username: `testuser${errorIndex}-${eventIndex}`,
-        };
+      const data = await response.json();
 
-        const captureContext: CaptureContext = {
-          user,
-          fingerprint: errorFingerprint,
-          level: 'error',
-        };
-
-        Sentry.captureMessage(`Error generated with event_id: ${event_id}`, captureContext);
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to generate errors');
       }
-    }
 
-    Sentry.flush(20000).then(() => {
       toast({
         title: 'Errors sent',
-        description: `${numErrors} errors with ${eventsPerError} events each have been sent to Sentry`,
+        description:
+          data.message ||
+          `${numErrors} errors with ${eventsPerError} events each have been sent to Sentry`,
         status: 'success',
         duration: 3000,
         isClosable: true,
       });
-    });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error instanceof Error ? error.message : 'Failed to generate errors',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const onClose = () => setIsOpen(false);
@@ -171,7 +175,13 @@ const ErrorGenerator = () => {
         </FormControl>
       )}
       <Box textAlign="right">
-        <Button onClick={() => setIsOpen(true)} colorScheme="brand" width="auto">
+        <Button
+          onClick={() => setIsOpen(true)}
+          colorScheme="brand"
+          width="auto"
+          isLoading={isLoading}
+          loadingText="Generating..."
+        >
           Generate Errors
         </Button>
       </Box>
@@ -191,7 +201,7 @@ const ErrorGenerator = () => {
               <Button ref={cancelRef} onClick={onClose}>
                 Cancel
               </Button>
-              <Button colorScheme="red" onClick={onConfirm} ml={3}>
+              <Button colorScheme="red" onClick={onConfirm} ml={3} isLoading={isLoading}>
                 Generate Errors
               </Button>
             </AlertDialogFooter>

@@ -1,0 +1,9 @@
+{
+  "buildCommand": "next build",
+  "functions": {
+    "app/api/generate-errors/route.ts": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
