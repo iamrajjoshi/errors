@@ -7,7 +7,12 @@ import * as Sentry from '@sentry/nextjs';
 Sentry.init({
   dsn: 'https://bc93467ad1c7f96297e1a2e0e62c5307@o4509294838415360.ingest.us.sentry.io/4509295513829381',
 
-  integrations: [Sentry.replayIntegration()],
+  integrations: [
+    Sentry.replayIntegration(),
+    Sentry.feedbackIntegration({
+      colorScheme: 'system',
+    }),
+  ],
 
   tracesSampleRate: 1,
   

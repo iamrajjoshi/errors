@@ -9,5 +9,5 @@ pnpm install
 Next, run the development server:
 
 ```bash
-vercel dev
+pnpm dev
 ```
