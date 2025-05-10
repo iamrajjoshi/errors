@@ -12,6 +12,7 @@ Sentry.init({
     Sentry.feedbackIntegration({
       colorScheme: 'system',
     }),
+    Sentry.browserTracingIntegration(),
   ],
 
   tracesSampleRate: 1,
