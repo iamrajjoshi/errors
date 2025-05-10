@@ -33,6 +33,7 @@
     "@typescript-eslint/parser": "^8.6.0",
     "framer-motion": "^11.5.4",
     "next": "14.2.11",
+    "posthog-js": "^1.240.6",
     "prettier": "^3.3.3",
     "react": "^18",
     "react-dom": "^18",
