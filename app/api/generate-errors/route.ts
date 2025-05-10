@@ -4,13 +4,6 @@ import * as Sentry from '@sentry/nextjs';
 // Set the runtime to edge
 export const runtime = 'edge';
 
-// Initialize Sentry for the Edge Function itself
-Sentry.init({
-  dsn: process.env.EDGE_FUNCTION_SENTRY_DSN,
-  environment: process.env.NODE_ENV || 'production',
-  tracesSampleRate: 1.0,
-});
-
 interface GenerateErrorsRequest {
   dsn: string;
   errorCount?: number;
@@ -113,10 +106,10 @@ export async function POST(request: NextRequest) {
           }
         } catch (e) {
           if (e instanceof Error) {
-            Sentry.captureMessage(`Error sending Sentry event: ${e.message}`);
+            Sentry.captureException(e);
             results.push({ event_id: eventId, status: 'failed', error: e.message });
           } else {
-            Sentry.captureMessage(`Error sending Sentry event: ${String(e)}`);
+            Sentry.captureException(e);
             results.push({ event_id: eventId, status: 'failed', error: String(e) });
           }
         }
