@@ -23,7 +23,7 @@
     ]
   },
   "dependencies": {
-    "@chakra-ui/react": "^2.8.2",
+    "@chakra-ui/react": "^2.10.7",
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@sentry/browser": "^8.30.0",
@@ -32,11 +32,13 @@
     "@typescript-eslint/eslint-plugin": "^8.6.0",
     "@typescript-eslint/parser": "^8.6.0",
     "framer-motion": "^11.5.4",
+    "install": "^0.13.0",
     "next": "14.2.11",
     "posthog-js": "^1.240.6",
     "prettier": "^3.3.3",
     "react": "^18",
     "react-dom": "^18",
+    "react-icons": "^5.5.0",
     "uuid": "^10.0.0"
   },
   "devDependencies": {

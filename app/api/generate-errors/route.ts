@@ -8,13 +8,14 @@ interface GenerateErrorsRequest {
     errorCount?: number;
     errorsToGenerate?: number;
     fingerprintID?: string;
+    tags?: Record<string, string>;
 }
 
 export async function POST(request: NextRequest) {
     try {
         const requestData = (await request.json()) as GenerateErrorsRequest;
 
-        const { dsn, errorCount = 1, errorsToGenerate = 1, fingerprintID } = requestData;
+        const { dsn, errorCount = 1, errorsToGenerate = 1, fingerprintID, tags = {} } = requestData;
 
         if (!dsn) {
             return NextResponse.json({ error: 'DSN is required' }, { status: 400 });
@@ -60,6 +61,17 @@ export async function POST(request: NextRequest) {
             for (let eventIndex = 0; eventIndex < errorCount; eventIndex++) {
                 const eventId = crypto.randomUUID();
 
+                // Merge default tags with custom tags, allowing custom tags to override defaults
+                const defaultTags = {
+                    generated_by: 'vercel-edge-function',
+                    environment: 'test',
+                };
+
+                const mergedTags = {
+                    ...defaultTags,
+                    ...tags, // Custom tags will override defaults (including environment)
+                };
+
                 // Create a Sentry event payload
                 const eventPayload = {
                     event_id: eventId,
@@ -76,10 +88,7 @@ export async function POST(request: NextRequest) {
                         email: `test-user-${errorIndex}-${eventIndex}@example.com`,
                         username: `testuser${errorIndex}-${eventIndex}`,
                     },
-                    tags: {
-                        generated_by: 'vercel-edge-function',
-                        environment: 'test',
-                    },
+                    tags: mergedTags,
                 };
 
                 try {
