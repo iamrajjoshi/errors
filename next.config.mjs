@@ -1,6 +1,25 @@
 import { withSentryConfig } from '@sentry/nextjs';
+import { execSync } from 'child_process';
+
+// Get commit information at build time
+function getCommitInfo() {
+  try {
+    const commitHash = execSync('git rev-parse --short HEAD', { encoding: 'utf8' }).trim();
+    return { commitHash };
+  } catch (error) {
+    console.warn('Could not get commit info:', error.message);
+    return { commitHash: 'unknown' };
+  }
+}
+
+const { commitHash } = getCommitInfo();
+
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
+const nextConfig = {
+  env: {
+    COMMIT_HASH: commitHash,
+  },
+};
 
 export default withSentryConfig(nextConfig, {
   // For all available options, see:
