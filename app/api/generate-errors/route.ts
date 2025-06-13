@@ -8,6 +8,7 @@ interface GenerateErrorsRequest {
     errorCount?: number;
     errorsToGenerate?: number;
     fingerprintID?: string;
+    priority?: 'HIGH' | 'MEDIUM' | 'LOW';
     tags?: Record<string, string>;
 }
 
@@ -15,11 +16,32 @@ export async function POST(request: NextRequest) {
     try {
         const requestData = (await request.json()) as GenerateErrorsRequest;
 
-        const { dsn, errorCount = 1, errorsToGenerate = 1, fingerprintID, tags = {} } = requestData;
+        const {
+            dsn,
+            errorCount = 1,
+            errorsToGenerate = 1,
+            fingerprintID,
+            priority = 'HIGH',
+            tags = {},
+        } = requestData;
 
         if (!dsn) {
             return NextResponse.json({ error: 'DSN is required' }, { status: 400 });
         }
+
+        // Map priority to Sentry levels
+        const getSentryLevel = (priority: string): string => {
+            switch (priority) {
+                case 'HIGH':
+                    return 'fatal';
+                case 'MEDIUM':
+                    return 'warning';
+                case 'LOW':
+                    return 'info';
+                default:
+                    return 'error';
+            }
+        };
 
         // Parse DSN to get Sentry project API endpoint
         let publicKey: string;
@@ -77,12 +99,12 @@ export async function POST(request: NextRequest) {
                     event_id: eventId,
                     timestamp: new Date().toISOString(),
                     platform: 'javascript',
-                    level: 'error',
+                    level: getSentryLevel(priority),
                     logger: 'edge-function',
                     transaction: `test-transaction-${errorIndex}-${eventIndex}`,
                     server_name: 'vercel-edge-function',
                     fingerprint: errorFingerprint,
-                    message: `Error generated with event_id: ${eventId}`,
+                    message: `Error generated with event_id: ${eventId} (Priority: ${priority})`,
                     user: {
                         id: `test-user-${errorIndex}-${eventIndex}`,
                         email: `test-user-${errorIndex}-${eventIndex}@example.com`,
@@ -128,7 +150,7 @@ export async function POST(request: NextRequest) {
 
         return NextResponse.json({
             success: true,
-            message: `Generated ${numErrors} errors with ${errorCount} events each`,
+            message: `Generated ${numErrors} errors with ${errorCount} events each (Priority: ${priority})`,
             results: results,
         });
     } catch (e) {

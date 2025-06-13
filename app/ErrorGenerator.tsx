@@ -28,6 +28,7 @@ import {
     Flex,
     IconButton,
     Divider,
+    Select,
 } from '@chakra-ui/react';
 import { FaPlus } from 'react-icons/fa6';
 
@@ -36,11 +37,14 @@ interface CustomTag {
     value: string;
 }
 
+type Priority = 'HIGH' | 'MEDIUM' | 'LOW';
+
 const ErrorGenerator = () => {
     const [dsn, setDsn] = useState('');
     const [errorCount, setErrorCount] = useState('1');
     const [errorsToGenerate, setErrorsToGenerate] = useState('1');
     const [fingerprintID, setFingerprintID] = useState('');
+    const [priority, setPriority] = useState<Priority>('HIGH');
     const [tags, setTags] = useState<CustomTag[]>([]);
     const [newTagKey, setNewTagKey] = useState('');
     const [newTagValue, setNewTagValue] = useState('');
@@ -145,6 +149,7 @@ const ErrorGenerator = () => {
                     errorCount: eventsPerError,
                     errorsToGenerate: numErrors,
                     fingerprintID,
+                    priority,
                     tags: tags.reduce((acc, tag) => ({ ...acc, [tag.key]: tag.value }), {}),
                 }),
             });
@@ -189,6 +194,14 @@ const ErrorGenerator = () => {
                 <FormLabel>Sentry DSN</FormLabel>
                 <Input placeholder="Enter Sentry DSN" value={dsn} onChange={handleDsnChange} />
                 <FormErrorMessage>{dsnError}</FormErrorMessage>
+            </FormControl>
+            <FormControl>
+                <FormLabel>Priority</FormLabel>
+                <Select value={priority} onChange={(e) => setPriority(e.target.value as Priority)}>
+                    <option value="HIGH">High</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="LOW">Low</option>
+                </Select>
             </FormControl>
             <FormControl>
                 <FormLabel>Fingerprint ID (Optional - to add events to a specific issue)</FormLabel>
