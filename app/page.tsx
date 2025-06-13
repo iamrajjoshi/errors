@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Container, Heading, Text, VStack, Link, HStack } from '@chakra-ui/react';
+import { Box, Container, Heading, Text, VStack, Link } from '@chakra-ui/react';
 import ErrorGenerator from './ErrorGenerator';
 
 const SentryPage = () => {
@@ -16,30 +16,23 @@ const SentryPage = () => {
                     <Heading as="h1" size="2xl" textAlign="center">
                         Sentry Error Generator
                     </Heading>
-                    <Text fontSize="xl" textAlign="center">
-                        Generate and send sample errors to your Sentry project.
-                    </Text>
                     <ErrorGenerator />
                 </VStack>
             </Container>
 
-            <Box as="footer" py={6} mt="auto">
-                <Container maxW="container.md">
-                    <HStack justify="center">
-                        <Text fontSize="xs" color="gray.500">
-                            Commit:{' '}
-                            <Link
-                                href={`https://github.com/iamrajjoshi/errors/commit/${process.env.COMMIT_HASH}`}
-                                isExternal
-                                color="gray.300"
-                                _hover={{ color: 'gray.200', textDecoration: 'underline' }}
-                                fontFamily="mono"
-                            >
-                                {process.env.COMMIT_HASH || 'unknown'}
-                            </Link>
-                        </Text>
-                    </HStack>
-                </Container>
+            <Box as="footer" py={6} mt="auto" textAlign="center">
+                <Text fontSize="sm" color="gray.500">
+                    Commit{' '}
+                    <Link
+                        href={`https://github.com/iamrajjoshi/errors/commit/${process.env.COMMIT_HASH}`}
+                        isExternal
+                        color="gray.300"
+                        _hover={{ color: 'gray.200', textDecoration: 'underline' }}
+                        fontFamily="mono"
+                    >
+                        {process.env.COMMIT_HASH || 'unknown'}
+                    </Link>
+                </Text>
             </Box>
         </Box>
     );

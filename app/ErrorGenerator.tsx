@@ -192,7 +192,7 @@ const ErrorGenerator = () => {
         <VStack spacing={4} align="stretch">
             <FormControl isInvalid={!!dsnError}>
                 <FormLabel>Sentry DSN</FormLabel>
-                <Input placeholder="Enter Sentry DSN" value={dsn} onChange={handleDsnChange} />
+                <Input placeholder="Enter your Sentry DSN" value={dsn} onChange={handleDsnChange} />
                 <FormErrorMessage>{dsnError}</FormErrorMessage>
             </FormControl>
             <FormControl>
@@ -204,9 +204,9 @@ const ErrorGenerator = () => {
                 </Select>
             </FormControl>
             <FormControl>
-                <FormLabel>Fingerprint ID (Optional - to add events to a specific issue)</FormLabel>
+                <FormLabel>Fingerprint (Optional)</FormLabel>
                 <Input
-                    placeholder="Enter a fingerprint ID to group errors"
+                    placeholder="Enter a fingerprint to group errors"
                     value={fingerprintID}
                     onChange={(e) => setFingerprintID(e.target.value)}
                 />
