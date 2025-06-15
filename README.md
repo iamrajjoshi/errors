@@ -1,13 +1,1 @@
-# Getting Started
-
-First, install the dependencies:
-
-```bash
-pnpm install
-```
-
-Next, run the development server:
-
-```bash
-pnpm dev
-```
+# This project is now part of Sentry - https://github.com/getsentry/error-generator
